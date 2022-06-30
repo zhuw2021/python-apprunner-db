@@ -40,7 +40,7 @@ def all_books(request):
         print('Database connection failed due to {}'.format(e))          
 
 #def all_books(request):
-    global mydb
+    #global mydb
     mycursor = mydb.cursor()
     mycursor.execute('SELECT name, title, year FROM authors, books WHERE authors.authorId = books.authorId ORDER BY year')
     title = 'Books'
