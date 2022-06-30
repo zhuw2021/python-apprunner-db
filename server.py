@@ -20,7 +20,7 @@ PORT = int(os.environ.get('PORT'))
 
 rds = boto3.client('rds')
 
-try:
+# try:
     token = rds.generate_db_auth_token(
         DBHostname=DATABASE_HOST,
         Port=DATABASE_PORT,
@@ -35,8 +35,8 @@ try:
         database=DATABASE_NAME,
         ssl_ca=DATABASE_CERT
     )
-except Exception as e:
-    print('Database connection failed due to {}'.format(e))          
+#except Exception as e:
+#    print('Database connection failed due to {}'.format(e))          
 
 def all_books(request):
     mycursor = mydb.cursor()
