@@ -19,39 +19,44 @@ os.environ['LIBMYSQL_ENABLE_CLEARTEXT_PLUGIN'] = '1'
 PORT = int(os.environ.get('PORT'))
 
 rds = boto3.client('rds')
-
-mydb = None 
-
-try:
-    token = rds.generate_db_auth_token(
+token = rds.generate_db_auth_token(
         DBHostname=DATABASE_HOST,
         Port=DATABASE_PORT,
         DBUsername=DATABASE_USER,
         Region=DATABASE_REGION
     )
-    mydb =  mysql.connector.connect(
-        host=DATABASE_HOST,
-        user=DATABASE_USER,
-        passwd=token,
-        port=DATABASE_PORT,
-        database=DATABASE_NAME,
-        ssl_ca=DATABASE_CERT
-    )
-except Exception as e:
-    print('Database connection failed due to {}'.format(e))          
+
 
 def all_books(request):
-    
-    mycursor = mydb.cursor()
-    mycursor.execute('SELECT name, title, year FROM authors, books WHERE authors.authorId = books.authorId ORDER BY year')
-    title = 'Books'
-    message = '<html><head><title>' + title + '</title></head><body>'
-    message += '<h1>' + title + '</h1>'
-    message += '<ul>'
-    for (name, title, year) in mycursor:
-        message += '<li>' + name + ' - ' + title + ' (' + str(year) + ')</li>'
-    message += '</ul>'
-    message += '</body></html>'
+    message = '<html><head><title>App Runner Private RDS Connect Test</title></head><body>'
+
+    try:
+        mydb =  mysql.connector.connect(
+            host=DATABASE_HOST,
+            user=DATABASE_USER,
+            passwd=token,
+            port=DATABASE_PORT,
+            database=DATABASE_NAME,
+            ssl_ca=DATABASE_CERT
+        )
+ 
+
+        mycursor = mydb.cursor()
+        mycursor.execute('SELECT name, title, year FROM authors, books WHERE authors.authorId = books.authorId ORDER BY year')
+        title = 'Books'
+        
+        message += '<h1>' + title + '</h1>'
+        message += '<ul>'
+        for (name, title, year) in mycursor:
+            message += '<li>' + name + ' - ' + title + ' (' + str(year) + ')</li>'
+        message += '</ul>'
+        message += '</body></html>'
+    except Exception as e:
+        message += '</ul>'
+        message += '</body></html>'
+        message += 'Database connection failed due to {}'.format(e)
+        print('Database connection failed due to {}'.format(e))         
+
     return Response(message)
 
 if __name__ == '__main__':
