@@ -29,7 +29,7 @@ token = rds.generate_db_auth_token(
 
 def all_books(request):
     message = '<html><head><title>App Runner Private RDS Connect Test</title></head><body>'
-
+    message += '<h1>' + token + '</h1>'
     try:
         mydb =  mysql.connector.connect(
             host=DATABASE_HOST,
